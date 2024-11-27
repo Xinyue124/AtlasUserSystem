@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.springboot.mapper.UserMapper">
+    <!-- Return all user information -->
+    <select id="getUserList" resultType="com.mybatis.springboot.pojo.User">
+        select * from user
+    </select>
+
+    <!-- Add a user -->
+    <insert id="insert" parameterType="com.mybatis.springboot.pojo.User">
+        INSERT INTO USER(NAME, AGE)
+        VALUES(#{name},#{age});
+    </insert>
+
+    <!-- Automatically add 100 users -->
+    <insert id="insertUsers">
+        INSERT INTO user(NAME, AGE)
+        VALUES
+        <foreach collection="userList" item="user" separator=",">
+            (#{user.name},#{user.age})
+        </foreach>
+    </insert>
+
+    <!-- Batch add users -->
+    <insert id="saveUsers" parameterType="java.util.List">
+        insert into user (name, age)
+        values
+        <foreach collection="users" item="user" separator=",">
+            ( #{user.name}, #{user.age} )
+        </foreach>
+    </insert>
+
+    <!-- Delete a user -->
+    <delete id="delete" parameterType="java.lang.Integer">
+        DELETE from USER WHERE ID = #{id};
+    </delete>
+
+    <!-- Batch delete users -->
+    <delete id="deleteByIds">
+        DELETE FROM user WHERE id in
+        <foreach collection="ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!-- Query by primary key -->
+    <select id="getOne" resultType="com.mybatis.springboot.pojo.User">
+        select * from user where ID = #{id}
+    </select>
+
+    <!-- Query by name -->
+    <select id="getByName" resultType="com.mybatis.springboot.pojo.User">
+        select * from user where NAME = #{name};
+    </select>
+
+    <!-- Fuzzy query by name -->
+    <select id="getByLikeName" resultType="com.mybatis.springboot.pojo.User">
+        select * from user where NAME like concat('%', #{name}, '%');
+    </select>
+
+    <!-- Query by age -->
+    <select id="getByAge" resultType="com.mybatis.springboot.pojo.User">
+        select * from user where AGE = #{id}
+    </select>
+
+    <!-- Update user information -->
+    <update id="update" parameterType="com.mybatis.springboot.pojo.User">
+        UPDATE USER SET NAME = #{name}, AGE = #{age} WHERE ID = #{id};
+    </update>
+
+    <!-- Batch update users -->
+    <update id = "updateUsers" parameterType="java.util.List">
+        <foreach collection="users" item="users" index="index" open="" close="" separator=";">
+            update user
+            <set>
+                <if test="users.name != null">
+                    name=#{users.name},
+                </if>
+                <if test="users.age != null">
+                    age=#{users.age},
+                </if>
+            </set>
+            where id= #{users.id}
+        </foreach>
+    </update>
+</mapper>
